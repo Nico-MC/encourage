@@ -13,7 +13,10 @@ from encourage.prompts import Document, MetaData
 
 
 class MarkdownIngestion:
-    """Load markdown files from disk and convert them into encourage Documents.
+    """Load PaddleDoc-generated markdown files and convert them into encourage Documents.
+
+    Typical source paths are files under the PaddleDoc repository, e.g.
+    ``../PaddleDoc/backend/storage/results/.../*.md``.
 
     This class keeps the integration point intentionally small:
     - A single markdown file can be converted into one ``Document``.
@@ -37,7 +40,7 @@ class MarkdownIngestion:
         self.keep_frontmatter_in_content = keep_frontmatter_in_content
 
     def load(self, path: str | Path, extra_meta: dict[str, Any] | None = None) -> list[Document]:
-        """Load one markdown file or all markdown files from a directory."""
+        """Load one PaddleDoc markdown file or all markdown files from a PaddleDoc output directory."""
         resolved = Path(path).expanduser().resolve()
         if not resolved.exists():
             raise FileNotFoundError(f"Path not found: {resolved}")
@@ -52,7 +55,7 @@ class MarkdownIngestion:
         directory: str | Path,
         extra_meta: dict[str, Any] | None = None,
     ) -> list[Document]:
-        """Load markdown files from a directory into Documents."""
+        """Load PaddleDoc markdown files from a directory into Documents."""
         root = Path(directory).expanduser().resolve()
         if not root.exists() or not root.is_dir():
             raise FileNotFoundError(f"Directory not found: {root}")
@@ -70,7 +73,7 @@ class MarkdownIngestion:
         base_dir: str | Path | None = None,
         extra_meta: dict[str, Any] | None = None,
     ) -> Document:
-        """Load a single markdown file into a Document."""
+        """Load a single PaddleDoc-generated markdown file into a Document."""
         path = Path(file_path).expanduser().resolve()
         if not path.exists() or not path.is_file():
             raise FileNotFoundError(f"File not found: {path}")

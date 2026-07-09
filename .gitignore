@@ -32,6 +32,9 @@ __pycache__/
 mlruns
 test.ipynb
 tes
-
+#
+# Generated from PaddleDoc markdown ingestion script
+docs/demo/paddledoc_ingested.json
+coverage.*
 coverage.*
 dist/*
