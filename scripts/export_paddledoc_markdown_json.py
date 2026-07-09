@@ -1,0 +1,60 @@
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+from encourage.utils import MarkdownIngestion
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Load a PaddleDoc markdown file and export encourage Document payload as JSON."
+    )
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=Path(
+            "/home/noster/source/repos/PaddleDoc/backend/storage/results/inbox/"
+            "4bb1d98f-84c5-4737-b9e9-24772ca67fea/"
+            "4bb1d98f-84c5-4737-b9e9-24772ca67fea.md"
+        ),
+        help="Absolute path to a PaddleDoc markdown file.",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("docs/demo/paddledoc_ingested.json"),
+        help="Output JSON file path (relative to encourage repo or absolute).",
+    )
+    parser.add_argument(
+        "--truncated",
+        action="store_true",
+        help="Store truncated document content in output JSON.",
+    )
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    input_path = args.input.expanduser().resolve()
+
+    loader = MarkdownIngestion()
+    docs = loader.load(input_path)
+
+    payload = {
+        "count": len(docs),
+        "documents": [doc.to_dict(truncated=args.truncated) for doc in docs],
+    }
+
+    output_path = args.output.expanduser()
+    if not output_path.is_absolute():
+        output_path = Path.cwd() / output_path
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    print(f"Wrote {payload['count']} document(s) to {output_path}")
+
+
+if __name__ == "__main__":
+    main()
