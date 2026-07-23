@@ -1,19 +1,23 @@
 """Module that defines the ResponseWrapper class."""
 
+from __future__ import annotations
+
 import logging
-from typing import Any, Iterator, Optional
+from typing import TYPE_CHECKING, Any, Iterator, Optional
 
 from openai.types.chat import ChatCompletion, ChatCompletionMessage
 from openai.types.chat.chat_completion import Choice
 
 from encourage.llm.response import Response
-from encourage.llm.vllm_classes import RequestOutput
 from encourage.prompts.context import Context
 from encourage.prompts.conversation import Conversation, Role
 from encourage.prompts.meta_data import MetaData
 from encourage.prompts.prompt import Prompt
 from encourage.prompts.prompt_collection import PromptCollection
 from encourage.utils.tracing import enable_tracing
+
+if TYPE_CHECKING:
+    from encourage.llm.vllm_classes import RequestOutput
 
 # Configure logging
 logger = logging.getLogger(__name__)

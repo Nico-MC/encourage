@@ -1,14 +1,18 @@
 """Interface definitions for RAG methods."""
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
-from encourage.llm import BatchInferenceRunner, ResponseWrapper
 from encourage.prompts.context import Document
 from encourage.prompts.meta_data import MetaData
 from encourage.vector_store import VectorStore
+
+if TYPE_CHECKING:
+    from encourage.llm import BatchInferenceRunner, ResponseWrapper
 
 
 class RAGMethodInterface(ABC):

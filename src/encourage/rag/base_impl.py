@@ -1,12 +1,13 @@
 """Module containing various RAG method implementations as classes."""
 
+from __future__ import annotations
+
 import logging
-from typing import Any, override
+from typing import TYPE_CHECKING, Any, override
 
 from chromadb.utils import embedding_functions
 from pydantic import BaseModel
 
-from encourage.llm import BatchInferenceRunner, ResponseWrapper
 from encourage.prompts import PromptCollection
 from encourage.prompts.context import Context, Document
 from encourage.prompts.meta_data import MetaData
@@ -16,6 +17,9 @@ from encourage.rag.base.factory import RAGFactory
 from encourage.rag.base.interface import RAGMethodInterface
 from encourage.utils.llm_mock import create_mock_response_wrapper
 from encourage.vector_store import ChromaClient, VectorStore
+
+if TYPE_CHECKING:
+    from encourage.llm import BatchInferenceRunner, ResponseWrapper
 
 logger = logging.getLogger(__name__)
 

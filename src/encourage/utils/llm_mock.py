@@ -1,10 +1,16 @@
 """Utility functions for creating mock LLM responses."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from openai.types.chat.chat_completion import ChatCompletion
 from openai.types.completion_usage import CompletionUsage
 
-from encourage.llm import ResponseWrapper
 from encourage.prompts import PromptCollection
+
+if TYPE_CHECKING:
+    from encourage.llm.response_wrapper import ResponseWrapper
 
 
 def create_mock_responses(prompt_collection: PromptCollection) -> list[ChatCompletion]:
@@ -31,5 +37,7 @@ def create_mock_responses(prompt_collection: PromptCollection) -> list[ChatCompl
 
 def create_mock_response_wrapper(prompt_collection: PromptCollection) -> ResponseWrapper:
     """Create a ResponseWrapper with mock responses."""
+    from encourage.llm.response_wrapper import ResponseWrapper
+
     mock_llm_response = create_mock_responses(prompt_collection)
     return ResponseWrapper.from_prompt_collection(mock_llm_response, prompt_collection)

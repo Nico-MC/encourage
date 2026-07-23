@@ -4,8 +4,6 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from encourage.llm.inference_runner import InferenceRunner
-
 
 class BaseRAGConfig(BaseModel):
     """Configuration for BaseRAG method.
@@ -31,7 +29,7 @@ class BaseRAGConfig(BaseModel):
     embedding_function: Any
     top_k: int
     retrieval_only: bool = False
-    runner: Optional[InferenceRunner] = None
+    runner: Optional[Any] = None
     additional_prompt: str = ""
     where: Optional[dict[str, str]] = None
     device: str = "cuda"

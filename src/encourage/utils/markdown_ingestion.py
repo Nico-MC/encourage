@@ -9,7 +9,8 @@ from typing import Any
 
 import yaml
 
-from encourage.prompts import Document, MetaData
+from encourage.prompts.context import Document
+from encourage.prompts.meta_data import MetaData
 
 
 class MarkdownIngestion:
@@ -84,7 +85,7 @@ class MarkdownIngestion:
         frontmatter, content = self._extract_frontmatter(raw)
         document_content = raw if self.keep_frontmatter_in_content else content
 
-        metadata_tags = {
+        metadata_tags: dict[str, Any] = {
             "source": "markdown",
             "loader": self.__class__.__name__,
             "filename": path.name,
@@ -122,6 +123,8 @@ class MarkdownIngestion:
 
         frontmatter_text = raw_text[4:end]
         content = raw_text[end + len(marker) :].lstrip("\n")
+        if content.startswith("---\n"):
+            content = content[4:].lstrip("\n")
 
         parsed = yaml.safe_load(frontmatter_text)
         if not isinstance(parsed, dict):
