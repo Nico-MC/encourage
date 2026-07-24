@@ -1,0 +1,17 @@
+Nutze ausschließlich die bereitgestellten Dokumente, um die Frage zu beantworten.
+Wenn Informationen fehlen, antworte klar: "Im bereitgestellten Kontext nicht enthalten."
+
+Frage:
+{{ user_prompt }}
+
+{% if documents %}
+Kontextdokumente:
+{% for document in documents %}
+[Dokument {{ loop.index }}]
+{{ document.content }}
+
+{% endfor %}
+{% else %}
+Kontextdokumente:
+[Keine Dokumente gefunden]
+{% endif %}
