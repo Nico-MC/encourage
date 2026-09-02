@@ -1,7 +1,9 @@
 """Hybrid RAG implementation combining vector embedding search with BM25 ranking."""
 
 import logging
+import re
 import uuid
+from dataclasses import replace
 from typing import Any, Dict, List, Tuple, override
 
 import numpy as np
@@ -14,6 +16,13 @@ from encourage.rag.base.factory import RAGFactory
 from encourage.rag.base_impl import BaseRAG
 
 logger = logging.getLogger(__name__)
+
+
+def _tokenize(text: str) -> list[str]:
+    normalized = text.lower().translate(str.maketrans({
+        'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss',
+    }))
+    return re.findall(r'[a-z0-9]+', normalized)
 
 
 @RAGFactory.register(RAGMethod.HybridBM25, HybridBM25RAGConfig)
@@ -50,7 +59,7 @@ class HybridBM25RAG(BaseRAG):
         self.documents = list(context_collection)
 
         # Create tokenized texts for BM25
-        self.document_texts = [doc.content.lower().split() for doc in self.documents]
+        self.document_texts = [_tokenize(doc.content) for doc in self.documents]
 
         # Create BM25 index
         self.bm25_index = BM25Okapi(self.document_texts)
@@ -64,7 +73,7 @@ class HybridBM25RAG(BaseRAG):
 
         """
         # Tokenize query and get scores
-        tokenized_query = query.lower().split()
+        tokenized_query = _tokenize(query)
         bm25_scores = self.bm25_index.get_scores(tokenized_query)
 
         # Get top k document indices
@@ -150,9 +159,16 @@ class HybridBM25RAG(BaseRAG):
         # Calculate hybrid scores
         scored_docs = self._compute_hybrid_scores(dense_docs, sparse_docs, sparse_scores)
 
-        # Sort by score and return top_k
-        sorted_docs = [doc for _, doc in sorted(scored_docs, key=lambda x: x[0], reverse=True)]
-        return sorted_docs[: self.top_k]
+        sorted_docs = sorted(scored_docs, key=lambda item: item[0], reverse=True)
+        total_documents = max(len(sorted_docs), 1)
+        return [
+            replace(
+                document,
+                score=score + (total_documents - rank) * 1e-12,
+                distance=None,
+            )
+            for rank, (score, document) in enumerate(sorted_docs[: self.top_k])
+        ]
 
     @override
     def retrieve_contexts(
